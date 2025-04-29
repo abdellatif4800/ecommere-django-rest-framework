@@ -15,12 +15,6 @@ class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=254)
     joined_at = serializers.DateTimeField(default=timezone.now)
     # posts = serializers.PrimaryKeyRelatedField(many=True, read_only=True, default=[])
-    followers = serializers.PrimaryKeyRelatedField(
-        many=True, read_only=True, default=[]
-    )
-    following = serializers.PrimaryKeyRelatedField(
-        many=True, read_only=True, default=[]
-    )
 
     def create(self, validated_data):
         plain_password = validated_data.get("password").encode()

@@ -1,3 +1,4 @@
+from apps.carts.models import Cart
 from django.shortcuts import render
 from .serializer import UserSerializer
 from rest_framework.views import APIView
@@ -9,11 +10,13 @@ from .helper import generate_token
 
 
 class UserRegiester(APIView):
-    # with APIView
+
     def post(self, request, format=None):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+
+            user = serializer.save()
+            Cart.objects.create(user=user)
             return Response(serializer.data)
         return Response(serializer.errors)
 

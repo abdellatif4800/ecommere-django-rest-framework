@@ -3,17 +3,20 @@ from .serializer import ProductSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Product
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework import status
+from pprint import pprint
 
 
 class Product_management(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAdminUser, IsAuthenticated]
 
     def post(self, request):
+
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+
             return Response(serializer.data)
         return Response(serializer.errors)
 
