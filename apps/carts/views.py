@@ -5,21 +5,30 @@ from .serializer import CartSerializer, ItemSerializer
 from rest_framework.decorators import api_view
 from .models import Cart, Item
 from rest_framework.response import Response
-from .serializer import CartSerializer
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from apps.products.serializer import ProductSerializer
 from rest_framework import status
 from django.utils import timezone
 from pprint import pprint
+from .permissions import CustomerAccessPermission
+from django.contrib.auth import authenticate, login
 
 
 class Cart_view(APIView):
+    # permission_classes = [IsAuthenticated]
+
     def get(self, request):
+        print(request.user)
+        user = authenticate(request, username="asd", password="pass")
+        if user is not None:
+            print(user)
+
         user_id = int(request.query_params.get("user_id"))
         target_cart = Cart.objects.get(user=user_id)
         all_items = []
         for item in target_cart.items.all():
             all_items.append(ItemSerializer(item).data)
-        pprint(all_items)
+
         return Response(
             {
                 "msg": "cart found",

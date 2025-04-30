@@ -9,7 +9,7 @@ from pprint import pprint
 
 
 class Product_management(APIView):
-    # permission_classes = [IsAdminUser, IsAuthenticated]
+    permission_classes = [IsAdminUser, IsAuthenticated]
 
     def post(self, request):
 
