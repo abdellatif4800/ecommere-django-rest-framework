@@ -7,16 +7,16 @@ from .models import User
 from pprint import pprint
 import bcrypt
 from .helper import generate_token
+from apps.orders.models import OrderList
 
 
 class UserRegiester(APIView):
-
     def post(self, request, format=None):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-
             user = serializer.save()
             Cart.objects.create(user=user)
+            OrderList.objects.create(user=user)
             return Response(serializer.data)
         return Response(serializer.errors)
 
