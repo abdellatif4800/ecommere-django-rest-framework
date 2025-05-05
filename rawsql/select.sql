@@ -1,6 +1,20 @@
-select * from carts_cart_items;
+select * from users_user;
+
+select * from carts_cart;
 select * from carts_item;
+select * from carts_cart_items;
+
+
+select * from orders_orderlist;
+select * from orders_orderlist_orders;
+select * from orders_order;
+select * from orders_order_item;
+select * from orders_order_items;
+
 select * from products_product;
+
+-- delete from orders_orderlist;
+
 
 SELECT
     c.id AS cart_id,
