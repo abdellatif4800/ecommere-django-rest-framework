@@ -14,12 +14,16 @@ class Order(models.Model):
     updated_at = models.DateTimeField(null=True)
     shipping_address = models.TextField(null=True)
     order_notes = models.TextField(null=True)
+
+    #  ------------------------------------
     PENDING = "pending"
+    PROCESSING = "processing"
     SHIPPED = "shipped"
     DELIVERED = "delivered"
-
+    # *********************
     ORDER_STATUS = {
         PENDING: "pending",
+        PROCESSING: "processing",
         SHIPPED: "shipped",
         DELIVERED: "delivered",
     }
@@ -27,10 +31,13 @@ class Order(models.Model):
         choices=ORDER_STATUS,
         default=PENDING,
     )
-    CASH_ON_DELIVERY = "cash on delivery"
-    VISA = "visa"
 
-    PAYMENT_METHOD = {CASH_ON_DELIVERY: "cash on delivery", VISA: "visa"}
+    #  ------------------------------------
+    CASH_ON_DELIVERY = "cash on delivery"
+    BY_CARD = " "
+
+    # *********************
+    PAYMENT_METHOD = {CASH_ON_DELIVERY: "cash on delivery", BY_CARD: "by card"}
     payment_method = models.CharField(
         choices=PAYMENT_METHOD, default=CASH_ON_DELIVERY)
 

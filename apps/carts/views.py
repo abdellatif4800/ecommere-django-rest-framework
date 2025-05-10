@@ -149,7 +149,8 @@ def change_quantity(request):
                 }
             )
         target_item.quantity = request.data["quantity"]
-        target_item.item_total = request.data["quantity"] * target_item.product.price
+        target_item.item_total = request.data["quantity"] * \
+            target_item.product.price
         print(target_item.product.stock)
         return Response(ItemSerializer(target_item).data)
 

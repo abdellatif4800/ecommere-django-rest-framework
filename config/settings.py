@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -13,7 +14,7 @@ SECRET_KEY = "django-insecure-$7rxo$xkm=bt*mt&5q50w+t&n*@q9^gx19$0d)hk*87b^wzu*9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -30,6 +31,8 @@ INSTALLED_APPS = [
     "apps.products",
     "apps.carts",
     "apps.orders",
+    "apps.payment",
+
 ]
 
 MIDDLEWARE = [
@@ -69,9 +72,10 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "ec-db",
-        "USER": "myuser",
-        "PASSWORD": "",
-        "HOST": "localhost",
+        "USER": "user",
+        "PASSWORD": "pass123",
+        # "HOST": "postgres-db",
+        'HOST': os.getenv('DB_HOST', 'postgres-db'),
         "PORT": "5432",
     }
 }

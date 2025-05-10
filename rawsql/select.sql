@@ -1,5 +1,7 @@
 select * from users_user;
 
+select * from products_product;
+
 select * from carts_cart;
 select * from carts_item;
 select * from carts_cart_items;
@@ -9,12 +11,9 @@ select * from orders_orderlist;
 select * from orders_orderlist_orders;
 select * from orders_order;
 select * from orders_order_item;
-select * from orders_order_items;
 
-select * from products_product;
-
--- delete from orders_orderlist;
-
+select * from payment_init_payment;
+select * from payment_transaction;
 
 SELECT
     c.id AS cart_id,

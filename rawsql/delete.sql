@@ -1,2 +1,3 @@
-delete from carts_cart_items;
--- delete from carts_cart;
+-- delete from orders_orderlist_orders;
+-- delete from orders_order;
+-- delete from orders_order_item;

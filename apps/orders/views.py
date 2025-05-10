@@ -26,27 +26,46 @@ class Order_view(APIView):
         target_orderList = OrderList.objects.get(user=user_id)
         target_cart = Cart.objects.get(user=user_id)
 
-        new_order = Order.objects.create(
-            order_total=target_cart.cart_total,
-            created_at=timezone.now(),
-        )
+        payment_method = request.data['payment_method']
 
-        for item in target_cart.items.all():
-            new_order_item = Order_Item.objects.create(
-                product=item.product, quantity=item.quantity, item_total=item.item_total
+        if len(target_cart.items.all()) != 0:
+            new_order = Order.objects.create(
+                order_total=target_cart.cart_total,
+                created_at=timezone.now(),
             )
-            new_order.items.add(new_order_item)
-        print(OrderSerializer(new_order).data)
 
-        target_orderList.orders.add(new_order)
+            for item in target_cart.items.all():
+                new_order_item = Order_Item.objects.create(
+                    product=item.product, quantity=item.quantity, item_total=item.item_total
+                )
+                new_order.items.add(new_order_item)
 
-        for item in target_cart.items.all():
-            target_cart.items.remove(item)
-            item.delete()
+            new_order.payment_method = payment_method
+            if payment_method == "cash on delivery":
+                new_order.shipping_status = "processing"
+                new_order.save()
+            elif payment_method == "by card":
+                new_order.shipping_status = "pending"
+                new_order.save()
 
-        return Response(
-            {
-                "orderList": OrderListSerializer(target_orderList).data,
-                "cart": CartSerializer(target_cart).data,
-            }
-        )
+            target_orderList.orders.add(new_order)
+
+            for item in target_cart.items.all():
+                target_cart.items.remove(item)
+                item.delete()
+                target_cart.cart_total = 0
+            target_cart.save()
+            return Response(
+                {
+                    "orderList": OrderListSerializer(target_orderList).data,
+                    "cart": CartSerializer(target_cart).data,
+                }
+            )
+        if len(target_cart.items.all()) == 0:
+
+            return Response(
+                {
+                    "msg": "Cart is empty"
+
+                }
+            )
