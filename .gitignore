@@ -1,12 +1,9 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
-
 # Environment files
 .env
 .env.*
-
-
 
 # Virtualenv
 venv/
@@ -15,7 +12,7 @@ ENV/
 .venv/
 .pyenv/
 
+apps/*/migrations/
+apps/!*/migrations/__init__.py
 
-*/migrations/
-!*/migrations/__init__.py
-
+./rawsql
