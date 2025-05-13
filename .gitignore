@@ -14,5 +14,3 @@ ENV/
 
 apps/*/migrations/
 apps/!*/migrations/__init__.py
-
-./rawsql
