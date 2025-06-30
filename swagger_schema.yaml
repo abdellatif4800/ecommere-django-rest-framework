@@ -23,17 +23,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RetriveProduct'
-              examples:
-                Example1:
-                  value:
-                    name: Product 1
-                    descreption: Description for Product 1
-                    price: 100.0
-                    stock: 50
-                    category: Consoles
-                  summary: Example 1
-                  description: longer description
+                $ref: '#/components/schemas/CreateModifyProduct'
           description: ''
   /product/deleteProduct/{prod_id}/:
     delete:
@@ -112,13 +102,7 @@ paths:
       - product
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateModifyProductRequest'
           application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/CreateModifyProductRequest'
-          multipart/form-data:
             schema:
               $ref: '#/components/schemas/CreateModifyProductRequest'
       security:
@@ -144,13 +128,7 @@ paths:
       - product
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchedCreateModifyProductRequest'
           application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedCreateModifyProductRequest'
-          multipart/form-data:
             schema:
               $ref: '#/components/schemas/PatchedCreateModifyProductRequest'
       security:
@@ -190,9 +168,12 @@ components:
           items:
             $ref: '#/components/schemas/Image'
           readOnly: true
-        main_image:
-          type: string
-          format: uri
+        extra:
+          type: object
+          additionalProperties:
+            type: string
+            format: uri
+          description: Optional extra fields
       required:
       - images
     CreateModifyProductRequest:
@@ -217,9 +198,12 @@ components:
           type: string
           minLength: 1
           default: Consoles
-        main_image:
-          type: string
-          format: binary
+        extra:
+          type: object
+          additionalProperties:
+            type: string
+            format: binary
+          description: Optional extra fields
     Image:
       type: object
       properties:
@@ -264,9 +248,12 @@ components:
           type: string
           minLength: 1
           default: Consoles
-        main_image:
-          type: string
-          format: binary
+        extra:
+          type: object
+          additionalProperties:
+            type: string
+            format: binary
+          description: Optional extra fields
     RetriveProduct:
       type: object
       properties:

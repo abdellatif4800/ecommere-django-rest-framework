@@ -22,6 +22,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class CreateModifyProductSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = Product
         fields = [
@@ -31,19 +32,18 @@ class CreateModifyProductSerializer(serializers.ModelSerializer):
             "stock",
             "category",
             "images",
-            "main_image",
         ]
-
-    name = serializers.CharField(default="Product 1")
-    descreption = serializers.CharField(default="Description for Product 1")
-    price = serializers.FloatField(default=100.0)
-    stock = serializers.IntegerField(default=50)
-    category = serializers.CharField(default="Consoles")
-    main_image = serializers.ImageField(required=False)
     images = ImageSerializer(many=True, read_only=True)
 
+
+   
     def create(self, validated_data):
-        return Product.objects.create(**validated_data)
+        images = validated_data.pop("images", [])
+        product = Product.objects.create(**validated_data)
+
+        for image in images:
+            Image.objects.create(product=product, photo=image,name=image.name)
+        return product
 
     def update(self, instance, validated_data):
         if "name" in validated_data:

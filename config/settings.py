@@ -26,34 +26,10 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    
 }
 
-SPECTACULAR_SETTINGS = {
-    "TITLE": "Your Project API",
-    "DESCRIPTION": "Your project description",
-    "VERSION": "1.0.0",
-    "SERVE_INCLUDE_SCHEMA": False,
-    "SWAGGER_UI_DIST": "SIDECAR",  # shorthand to use the sidecar instead
-    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
-    "REDOC_DIST": "SIDECAR",
-    "COMPONENT_SPLIT_REQUEST": True,
-    # OTHER SETTINGS
-}
-STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.s3.S3Storage",
-        "OPTIONS": {
-            "access_key": "user123",
-            "secret_key": "pass123123",
-            "bucket_name": "my-bucket",
-            "endpoint_url": "http://minio-storage:9000",
-        },
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
+
 
 INSTALLED_APPS = [
     "unfold",
@@ -74,10 +50,7 @@ INSTALLED_APPS = [
     # -------------------------
     "rest_framework",
     "rest_framework.authtoken",
-    # -------------------------
-    # "drf_yasg",
-    "drf_spectacular",
-    "drf_spectacular_sidecar",
+
     # -------------------------
     "apps.users",
     "apps.products",
@@ -124,11 +97,11 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "ec-db",
+        "NAME": "ecommerce_db",
         "USER": "user",
         "PASSWORD": "pass123",
         # "HOST": "postgres-db",
-        "HOST": os.getenv("DB_HOST", "ecommerce-postgres"),
+        "HOST": os.getenv("DB_HOST", "postgres-db"),
         "PORT": "5432",
     }
 }
@@ -136,12 +109,26 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://ecommerce-redis:6379/1",
+        "LOCATION": "redis://redis-db:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             # "PASSWORD": "mysecret"
         },
     }
+}
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "access_key": "user123",
+            "secret_key": "pass123123",
+            "bucket_name": "my-bucket",
+            "endpoint_url": "http://minio-storage:9000",
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
 }
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

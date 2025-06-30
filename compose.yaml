@@ -1,15 +1,15 @@
 name: ecommerce-django
 
 services:
-  ecommerce-app:
+  django-app:
     build:
       context: ./
       dockerfile: Dockerfile
-    container_name: ecommerce-app
+    container_name: ecommerce-django
     ports:
       - "8000:8000"
     networks:
-      - ecommerce-django-network
+      - app-network
     volumes:
       - ./:/usr/src/app
     environment:
@@ -18,49 +18,47 @@ services:
     stdin_open: true 
     tty: true
 
-  ecommerce-postgres:
+  postgres-db:
     image: postgres:latest
-    container_name: ecommerce-psql
+    container_name: ecommerce-postgres
     # restart: always
     networks:
-      - ecommerce-django-network
+      - app-network
     volumes:
-      - app-volume:/var/lib/postgresql/data
+      - postgres-volume:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass123
-      POSTGRES_DB: ec-db
+      POSTGRES_DB: ecommerce_db
     mem_limit: 512mb
 
-  ecommerce-redis:
+  redis-db:
     image: redis:latest
-    container_name: ecommerece-redis
+    container_name: ecommerce-redis
     networks:
-      - ecommerce-django-network
+      - app-network
     ports:
       - "6379:6379"
     volumes:
-      - redis_data:/data
+      - redis-volume:/data
     mem_limit: 256m
   
-  ecommerce-ngrok:
-    image: ngrok/ngrok:latest
-    network_mode: host
-    environment:
-      - NGROK_AUTHTOKEN=2wnxGfsaNvmBBnNMeD8hocMbQsF_7gbtC95SbxDWurqp92Q7F
-    command: http --log=stdout 8000
-    stdin_open: true
-    tty: true
+  cloudflared-tunnel:
+    container_name: ecommerce-cloudflared-tunnel
+    image: cloudflare/cloudflared:latest
+    depends_on:
+      - django-app
+    command: tunnel --url http://django-app:8000 --no-autoupdate
     mem_limit: 128m
 
   minio-storage:
     image: quay.io/minio/minio
-    container_name: ec-minio
+    container_name: ecommerce-minio
     networks:
-      - ecommerce-django-network
+      - app-network
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -69,18 +67,16 @@ services:
       MINIO_ROOT_PASSWORD: pass123123
     command: server /data --console-address ":9001"
     volumes:
-      - minio_data:/data
+      - minio-volume:/data
 
 
 
 
 networks:
-  ecommerce-django-network:
+  app-network:
     driver: bridge
 
 volumes:
-  app-volume:
-  pgadmin-volume:
-  redis_data:
-  pgadmin-data:
-  minio_data:
+  postgres-volume:
+  redis-volume:
+  minio-volume:

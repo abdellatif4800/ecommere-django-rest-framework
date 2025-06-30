@@ -31,14 +31,6 @@ from .images_handler import saveImages
 from pprint import pprint
 
 
-from drf_spectacular.utils import (
-    extend_schema,
-    extend_schema_field,
-    OpenApiParameter,
-    OpenApiExample,
-    OpenApiRequest,
-)
-from drf_spectacular.types import OpenApiTypes
 
 
 class Create_product(CreateAPIView):
@@ -46,7 +38,7 @@ class Create_product(CreateAPIView):
     # permission_classes = [IsAdminUser, IsAuthenticated]
 
     serializer_class = CreateModifyProductSerializer
-    parser_classes = [FormParser]
+    parser_classes = [MultiPartParser]
 
     def get_queryset(self):
         return Product.objects.all()
@@ -59,14 +51,11 @@ class Create_product(CreateAPIView):
             if request.FILES:
                 saveImages(request.FILES, serializer.data["id"])
 
-            # return Response(123)
+            
             return Response(
                 {
                     "data": serializer.data,
-                    # "imgs": [
-                    #     request.FILES.get("main image").name,
-                    #     request.FILES.get("image2").name,
-                    # ],
+                 
                 },
                 status=status.HTTP_201_CREATED,
             )
