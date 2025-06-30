@@ -1,27 +1,51 @@
-from .models import Product
+from .models import Product, Image
 from rest_framework import serializers
 from django.utils import timezone
+from drf_spectacular.utils import (
+    extend_schema,
+    extend_schema_serializer,
+    extend_schema_field,
+    OpenApiParameter,
+    OpenApiExample,
+)
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class ImageSerializer(serializers.ModelSerializer):
+    photo_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Image
+        fields = ["id", "name", "photo_url"]  # photo is an ImageField
+
+    def get_photo_url(self, obj):
+        return obj.photo.url if obj.photo else None
+
+
+class CreateModifyProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = "__all__"
+        fields = [
+            "name",
+            "descreption",
+            "price",
+            "stock",
+            "category",
+            "images",
+            "main_image",
+        ]
 
-    name = serializers.CharField()
-    descreption = serializers.CharField()
-    price = serializers.IntegerField()
-    stock = serializers.IntegerField()
-    category = serializers.CharField()
-    image = serializers.URLField(default="")
-    created_at = serializers.DateTimeField(default=timezone.now)
-    updated_at = serializers.DateTimeField(default=None)
+    name = serializers.CharField(default="Product 1")
+    descreption = serializers.CharField(default="Description for Product 1")
+    price = serializers.FloatField(default=100.0)
+    stock = serializers.IntegerField(default=50)
+    category = serializers.CharField(default="Consoles")
+    main_image = serializers.ImageField(required=False)
+    images = ImageSerializer(many=True, read_only=True)
 
     def create(self, validated_data):
         return Product.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-
         if "name" in validated_data:
             instance.name = validated_data["name"]
 
@@ -36,3 +60,11 @@ class ProductSerializer(serializers.ModelSerializer):
         instance.updated_at = timezone.now()
         instance.save()
         return instance
+
+
+class RetriveProductSerializer(serializers.ModelSerializer):
+    images = ImageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Product
+        fields = "__all__"

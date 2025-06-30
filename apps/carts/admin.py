@@ -1,3 +1,8 @@
 from django.contrib import admin
+from . import models
+from unfold.admin import ModelAdmin
 
-# Register your models here.
+
+@admin.register(models.Cart)
+class CustomAdminClass(ModelAdmin):
+    pass

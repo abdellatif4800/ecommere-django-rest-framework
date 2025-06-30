@@ -1,5 +1,13 @@
 from django.contrib import admin
-from .models import OrderList, Order
+from unfold.admin import ModelAdmin
+from . import models
 
-admin.site.register(OrderList)
-admin.site.register(Order)
+
+@admin.register(models.OrderList)
+class OrderListClass(ModelAdmin):
+    pass
+
+
+@admin.register(models.Order)
+class OrderClass(ModelAdmin):
+    pass

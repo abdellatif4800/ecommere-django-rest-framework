@@ -8,6 +8,14 @@ class Product(models.Model):
     price = models.IntegerField()
     stock = models.IntegerField()
     category = models.CharField()
-    image = models.URLField(default="")
+    # image = models.ForeignKey("image", on_delete=models.CASCADE, blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
+
+
+class Image(models.Model):
+    name = models.CharField(max_length=255, default="Main Image")
+    photo = models.ImageField(upload_to="products/")
+    product = models.ForeignKey(
+        Product, related_name="images", on_delete=models.CASCADE
+    )

@@ -1,16 +1,32 @@
 from django.urls import path, include
-from .views import Product_management, ProductDetailView, ProductListView
+from . import views
 from rest_framework.urlpatterns import format_suffix_patterns
 
 
 urlpatterns = [
-    path("createProd/", Product_management.as_view()),
-    path("updateProd/<int:prod_id>/", Product_management.as_view()),
-    path("deleteProd/<int:prod_id>/", Product_management.as_view()),
+    path("createProduct/", views.Create_product.as_view(), name="Create Product"),
+    path(
+        "updateProduct/<int:prod_id>/",
+        views.Update_product.as_view(),
+        name="Update Product",
+    ),
+    path(
+        "deleteProduct/<int:prod_id>/",
+        views.Delete_product.as_view(),
+        name="Delete Product",
+    ),
     # --------- retrive --------------
-    path("getProd/<int:id>/", ProductDetailView.as_view()),
-    path("getAllProds/", ProductListView.as_view()),
+    path(
+        "productByID/<int:prod_id>/",
+        views.Product_by_id.as_view(),
+        name="Product by id",
+    ),
+    path(
+        "productsByCategories/<str:category>/",
+        views.CategoriesListView.as_view(),
+        name="by categories",
+    ),
 ]
 
 
-urlpatterns = format_suffix_patterns(urlpatterns)
+# urlpatterns = format_suffix_patterns(urlpatterns)

@@ -12,5 +12,5 @@ ENV/
 .venv/
 .pyenv/
 
-apps/*/migrations/
-apps/!*/migrations/__init__.py
+# apps/*/migrations/
+# apps/!*/migrations/__init__.py
