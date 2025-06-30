@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Order_Item(models.Model):
@@ -38,10 +39,9 @@ class Order(models.Model):
 
     # *********************
     PAYMENT_METHOD = {CASH_ON_DELIVERY: "cash on delivery", BY_CARD: "by card"}
-    payment_method = models.CharField(
-        choices=PAYMENT_METHOD, default=CASH_ON_DELIVERY)
+    payment_method = models.CharField(choices=PAYMENT_METHOD, default=CASH_ON_DELIVERY)
 
 
 class OrderList(models.Model):
-    user = models.ForeignKey("users.User", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     orders = models.ManyToManyField(Order)

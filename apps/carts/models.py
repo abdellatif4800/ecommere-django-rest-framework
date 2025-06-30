@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Item(models.Model):
@@ -8,7 +9,7 @@ class Item(models.Model):
 
 
 class Cart(models.Model):
-    user = models.ForeignKey("users.User", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     items = models.ManyToManyField(Item)
     cart_total = models.IntegerField(default=0)
 

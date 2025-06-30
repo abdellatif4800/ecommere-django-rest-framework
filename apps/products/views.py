@@ -66,7 +66,7 @@ class Update_product(UpdateAPIView):
     # authentication_classes = [BasicAuthentication]
     # permission_classes = [IsAdminUser, IsAuthenticated]
     serializer_class = CreateModifyProductSerializer
-    parser_classes = [FormParser]
+    
 
     def put(self, request, *args, **kwargs):
         try:

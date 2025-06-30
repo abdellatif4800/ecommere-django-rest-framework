@@ -49,9 +49,11 @@ services:
   cloudflared-tunnel:
     container_name: ecommerce-cloudflared-tunnel
     image: cloudflare/cloudflared:latest
+    networks:
+      - app-network
     depends_on:
       - django-app
-    command: tunnel --url http://django-app:8000 --no-autoupdate
+    command: tunnel --url http://django-app:8000
     mem_limit: 128m
 
   minio-storage:

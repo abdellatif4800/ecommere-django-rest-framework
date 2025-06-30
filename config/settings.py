@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from datetime import timedelta
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,12 +26,21 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.SessionAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
-    
 }
 
 
-
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+    "TOKEN_OBTAIN_SERIALIZER": "apps.users.serializer.MyTokenObtainPairSerializer",
+}
 INSTALLED_APPS = [
     "unfold",
     "unfold.contrib.filters",
@@ -50,7 +60,7 @@ INSTALLED_APPS = [
     # -------------------------
     "rest_framework",
     "rest_framework.authtoken",
-
+    "rest_framework_simplejwt",
     # -------------------------
     "apps.users",
     "apps.products",
