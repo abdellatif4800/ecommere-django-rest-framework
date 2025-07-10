@@ -11,38 +11,39 @@ from drf_spectacular.utils import (
 
 
 class ImageSerializer(serializers.ModelSerializer):
-    photo_url = serializers.SerializerMethodField()
-
     class Meta:
         model = Image
-        fields = ["id", "name", "photo_url"]  # photo is an ImageField
+        fields = "__all__"
 
-    def get_photo_url(self, obj):
-        return obj.photo.url if obj.photo else None
+    def create(self, validate_data):
+        image = Image.objects.create(**validate_data)
+
+        return image
+
+    def update(self, instance, validated_data):
+        if "name" in validated_data:
+            instance.name = validated_data["name"]
+
+        if "photo" in validated_data:
+            instance.photo = validated_data["photo"]
+
+        instance.save()
+        return instance
 
 
 class CreateModifyProductSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Product
-        fields = [
-            "name",
-            "descreption",
-            "price",
-            "stock",
-            "category",
-            "images",
-        ]
     images = ImageSerializer(many=True, read_only=True)
 
+    class Meta:
+        model = Product
+        fields = "__all__"
 
-   
     def create(self, validated_data):
-        images = validated_data.pop("images", [])
         product = Product.objects.create(**validated_data)
-
+        images = self.context.get("request").FILES
         for image in images:
-            Image.objects.create(product=product, photo=image,name=image.name)
+            Image.objects.create(product=product, photo=images.get(image), name=image)
+
         return product
 
     def update(self, instance, validated_data):
@@ -57,6 +58,7 @@ class CreateModifyProductSerializer(serializers.ModelSerializer):
 
         if "stock" in validated_data:
             instance.stock = validated_data["stock"]
+
         instance.updated_at = timezone.now()
         instance.save()
         return instance

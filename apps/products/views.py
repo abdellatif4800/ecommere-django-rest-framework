@@ -23,83 +23,49 @@ from rest_framework.authentication import (
     TokenAuthentication,
 )
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.pagination import PageNumberPagination
 
-from .serializer import CreateModifyProductSerializer, RetriveProductSerializer
+from .serializer import (
+    CreateModifyProductSerializer,
+    RetriveProductSerializer,
+    ImageSerializer,
+)
 from .models import Image, Product
 from .images_handler import saveImages
 
 from pprint import pprint
 
 
-
-
 class Create_product(CreateAPIView):
-    # authentication_classes = [BasicAuthentication]
-    # permission_classes = [IsAdminUser, IsAuthenticated]
-
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAdminUser, IsAuthenticated]
     serializer_class = CreateModifyProductSerializer
     parser_classes = [MultiPartParser]
 
     def get_queryset(self):
         return Product.objects.all()
 
-    def create(self, request, *args, **kwargs):
-        serializer = CreateModifyProductSerializer(data=request.data)
-
-        if serializer.is_valid():
-            serializer.save()
-            if request.FILES:
-                saveImages(request.FILES, serializer.data["id"])
-
-            
-            return Response(
-                {
-                    "data": serializer.data,
-                 
-                },
-                status=status.HTTP_201_CREATED,
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class Update_product(UpdateAPIView):
-    # authentication_classes = [BasicAuthentication]
-    # permission_classes = [IsAdminUser, IsAuthenticated]
+    queryset = Product.objects.all()
     serializer_class = CreateModifyProductSerializer
-    
+    lookup_field = "id"
 
-    def put(self, request, *args, **kwargs):
-        try:
-            product = Product.objects.get(id=kwargs["prod_id"])
-        except Product.DoesNotExist:
-            return Response(
-                {"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND
-            )
-        serializer = CreateModifyProductSerializer(
-            product, data=request.data, partial=True
-        )
-        if serializer.is_valid():
-            serializer.save()
+    parser_classes = [MultiPartParser]
 
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAdminUser, IsAuthenticated]
 
 
 class Delete_product(DestroyAPIView):
-    # authentication_classes = [BasicAuthentication]
-    # permission_classes = [IsAdminUser, IsAuthenticated]
+    queryset = Product.objects.all()
     serializer_class = RetriveProductSerializer
+    lookup_field = "id"
 
-    def delete(self, request, prod_id):
-        try:
-            product = Product.objects.get(id=prod_id)
-        except Product.DoesNotExist:
-            return Response(
-                {"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND
-            )
+    parser_classes = [MultiPartParser]
 
-        product.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    permission_classes = [IsAdminUser, IsAuthenticated]
+    authentication_classes = [BasicAuthentication]
 
 
 class CategoriesListView(ListAPIView):
@@ -134,3 +100,24 @@ class Product_by_id(RetrieveAPIView):
                 {"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND
             )
         return Response(target_prod, status=status.HTTP_200_OK)
+
+
+class AddNewImage(CreateAPIView):
+    serializer_class = ImageSerializer
+    queryset = Image.objects.all()
+
+    parser_classes = [MultiPartParser]
+
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAdminUser, IsAuthenticated]
+
+
+class UpdateNewImage(UpdateAPIView):
+    serializer_class = ImageSerializer
+    queryset = Image.objects.all()
+    lookup_field = "id"
+
+    parser_classes = [MultiPartParser]
+
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAdminUser, IsAuthenticated]

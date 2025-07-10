@@ -6,16 +6,27 @@ from rest_framework.urlpatterns import format_suffix_patterns
 urlpatterns = [
     path("createProduct/", views.Create_product.as_view(), name="Create Product"),
     path(
-        "updateProduct/<int:prod_id>/",
+        "updateProduct/<int:id>/",
         views.Update_product.as_view(),
         name="Update Product",
     ),
     path(
-        "deleteProduct/<int:prod_id>/",
+        "deleteProduct/<int:id>/",
         views.Delete_product.as_view(),
         name="Delete Product",
     ),
-    # --------- retrive --------------
+    # --------- manage images --------------
+    path(
+        "addNewImage/",
+        views.AddNewImage.as_view(),
+        name="add new image for existed prod",
+    ),
+    path(
+        "updateImage/<int:id>/",
+        views.UpdateNewImage.as_view(),
+        name="udate existed image",
+    ),
+    # --------- retrive products --------------
     path(
         "productByID/<int:prod_id>/",
         views.Product_by_id.as_view(),

@@ -8,7 +8,6 @@ class Product(models.Model):
     price = models.IntegerField()
     stock = models.IntegerField()
     category = models.CharField()
-    # image = models.ForeignKey("image", on_delete=models.CASCADE, blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
 
