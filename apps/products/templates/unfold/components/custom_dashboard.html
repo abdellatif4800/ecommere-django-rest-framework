@@ -1,0 +1,8 @@
+{% load unfold %}
+
+<div class="flex flex-col bg-red-200 border border-2">
+    {% component "unfold/components/chart/cohort.html" with component_class="MyComponent" %}
+    {% component "unfold/components/table.html" with table=table_data card_included=1 striped=1 %}{% endcomponent %}
+    {% endcomponent %}
+
+</div>

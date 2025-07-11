@@ -53,6 +53,7 @@ six==1.17.0
 social-auth-app-django==5.5.1
 social-auth-core==4.7.0
 sqlparse==0.5.3
+stripe==12.3.0
 swagger-spec-validator==3.0.4
 tablib==3.8.0
 typing_extensions==4.14.0

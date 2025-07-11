@@ -36,6 +36,22 @@ from .images_handler import saveImages
 from pprint import pprint
 
 
+def dashboard_callback(request, context):
+    context.update(
+        {
+            "sample": "example",
+            "table_data": {
+                "headers": ["col 1", "col 2"],
+                "rows": [
+                    ["a", "b"],
+                    ["c", "d"],
+                ],
+            },
+        }
+    )
+    return context
+
+
 class Create_product(CreateAPIView):
     authentication_classes = [BasicAuthentication]
     permission_classes = [IsAdminUser, IsAuthenticated]

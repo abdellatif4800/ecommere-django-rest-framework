@@ -44,13 +44,13 @@ SIMPLE_JWT = {
     "TOKEN_OBTAIN_SERIALIZER": "apps.users.serializer.MyTokenObtainPairSerializer",
 }
 INSTALLED_APPS = [
-    # "unfold",
-    # "unfold.contrib.filters",
-    # "unfold.contrib.forms",
-    # "unfold.contrib.inlines",
-    # "unfold.contrib.import_export",
-    # "unfold.contrib.guardian",
-    # "unfold.contrib.simple_history",
+    "unfold",
+    "unfold.contrib.filters",
+    "unfold.contrib.forms",
+    "unfold.contrib.inlines",
+    "unfold.contrib.import_export",
+    "unfold.contrib.guardian",
+    "unfold.contrib.simple_history",
     "django.contrib.admin",
     "import_export",
     # ------------------------
@@ -184,49 +184,49 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-# def badge_callback(request):
-#     return 3
+def badge_callback(request):
+    return 3
 
 
-# UNFOLD = {
-#     "SITE_TITLE": "Custom suffix in <title> tag",
-#     "SITE_HEADER": "UNFOLD DEMO",
-#     "DASHBOARD_CALLBACK": "apps.products.views.dashboard_callback",
-#     "SITE_DROPDOWN": [
-#         {
-#             "icon": "diamond",
-#             "title": _("My site"),
-#             "link": "https://google.com",
-#         },
-#         {
-#             "icon": "diamond",
-#             "title": _("admin index"),
-#             "link": reverse_lazy("admin:index"),
-#         },
-#     ],
-#     "SIDEBAR": {
-#         "show_search": True,
-#         "show_all_applications": False,
-#         "navigation": [
-#             {
-#                 "title": _("Navigation"),
-#                 "separator": True,
-#                 "collapsible": True,
-#                 "items": [
-#                     {
-#                         "title": _("Dashboard"),
-#                         "icon": "dashboard",  # Supported icon set: https://fonts.google.com/icons
-#                         "link": reverse_lazy("admin:index"),
-#                         "badge": badge_callback,
-#                         "permission": lambda request: request.user.is_superuser,
-#                     },
-#                     {
-#                         "title": _("Users"),
-#                         "icon": "people",
-#                         "link": reverse_lazy("admin:auth_user_changelist"),
-#                     },
-#                 ],
-#             }
-#         ],
-#     },
-# }
+UNFOLD = {
+    "SITE_TITLE": "Custom suffix in <title> tag",
+    "SITE_HEADER": "UNFOLD DEMO",
+    "DASHBOARD_CALLBACK": "apps.products.views.dashboard_callback",
+    "SITE_DROPDOWN": [
+        {
+            "icon": "diamond",
+            "title": _("My site"),
+            "link": "https://google.com",
+        },
+        {
+            "icon": "diamond",
+            "title": _("admin index"),
+            "link": reverse_lazy("admin:index"),
+        },
+    ],
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": False,
+        "navigation": [
+            {
+                "title": _("Navigation"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Dashboard"),
+                        "icon": "dashboard",  # Supported icon set: https://fonts.google.com/icons
+                        "link": reverse_lazy("admin:index"),
+                        "badge": badge_callback,
+                        "permission": lambda request: request.user.is_superuser,
+                    },
+                    {
+                        "title": _("Users"),
+                        "icon": "people",
+                        "link": reverse_lazy("admin:auth_user_changelist"),
+                    },
+                ],
+            }
+        ],
+    },
+}
