@@ -1,12 +1,17 @@
 from django.urls import path, include
-from .views import Order_view, OrderList_view
+from . import views
 from rest_framework.urlpatterns import format_suffix_patterns
 
 
 urlpatterns = [
-    path("getOrderList/", OrderList_view.as_view()),
-    path("addOrder/", Order_view.as_view()),
+    path(
+        "newOrder/fromCart/<int:cart_id>/",
+        views.Create_order.as_view(),
+        name="new-order",
+    ),
+    path(
+        "getOrderByID/<int:id>/",
+        views.Retrive_order.as_view(),
+        name="retrive_order",
+    ),
 ]
-
-
-urlpatterns = format_suffix_patterns(urlpatterns)

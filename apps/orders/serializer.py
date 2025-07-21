@@ -1,43 +1,40 @@
-from .models import OrderList, Order
-from apps.carts.models import Item
+from .models import Order, OrderItem
 from apps.products.models import Product
-from apps.users.models import User
+
 from rest_framework import serializers
+from rest_framework import status
+
 from django.utils import timezone
+from django.shortcuts import get_object_or_404, get_list_or_404
 
 
-class OrderListSerializer(serializers.ModelSerializer):
+class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
-        model = OrderList
+        model = OrderItem
         fields = "__all__"
-
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    orders = serializers.PrimaryKeyRelatedField(
-        queryset=Order.objects.all(), many=True)
 
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = "__all__"
+        # read_only_fields = ["shipping_status"]
 
-    items = serializers.PrimaryKeyRelatedField(
-        queryset=Item.objects.all(), many=True)
-    order_tota = serializers.IntegerField(read_only=True)
-    created_at = serializers.DateTimeField(default=None)
-    updated_at = serializers.DateTimeField(default=None)
-    shipping_address = serializers.CharField()
-    order_notes = serializers.CharField()
-    shipping_status = serializers.ChoiceField(
-        choices=Order.ORDER_STATUS, default=Order.PENDING
-    )
-    payment_method = serializers.ChoiceField(
-        choices=Order.PAYMENT_METHOD, default=Order.CASH_ON_DELIVERY
-    )
+    order_items = OrderItemSerializer(many=True)
 
-    # def create(self, validated_data):
-    #     return Cart.objects.create(**validated_data)
-    #
+    def create(self, validated_data):
+        order_items_data = validated_data.pop("order_items")
+
+        if validated_data["payment_method"] == "by card":
+            validated_data["shipping_status"] = "processing"
+
+        order = Order.objects.create(**validated_data)
+
+        for item_data in order_items_data:
+            OrderItem.objects.create(order=order, **item_data)
+
+        return order
+
     def update(self, instance, validated_data):
         instance.updated_at = timezone.now()
         instance.save()

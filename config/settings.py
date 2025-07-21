@@ -27,18 +27,29 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
     ],
+    # "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    # "TEST_REQUEST_RENDERER_CLASSES": [
+    # "rest_framework.renderers.MultiPartRenderer",
+    # "rest_framework.renderers.JSONRenderer",
+    #     # "rest_framework.renderers.TemplateHTMLRenderer",
+    # ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 100,
+    "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",
 }
 
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ALGORITHM": "HS256",
     "SIGNING_KEY": SECRET_KEY,
+    "ROTATE_REFRESH_TOKENS": True,  # issue new refresh token on use
+    "BLACKLIST_AFTER_ROTATION": True,  # blacklist old refresh token
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "AUTH_HEADER_TYPES": ("Bearer",),
     "TOKEN_TYPE_CLAIM": "token_type",
     "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
     "TOKEN_OBTAIN_SERIALIZER": "apps.users.serializer.MyTokenObtainPairSerializer",
@@ -103,8 +114,8 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+# Database & Storage
+
 
 DATABASES = {
     "default": {
@@ -112,7 +123,7 @@ DATABASES = {
         "NAME": "ecommerce_db",
         "USER": "user",
         "PASSWORD": "pass123",
-        # "HOST": "postgres-db",
+        # "HOST": "localhost",
         "HOST": os.getenv("DB_HOST", "postgres-db"),
         "PORT": "5432",
     }
@@ -121,7 +132,8 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis-db:6379/1",
+        "LOCATION": "redis://redis-db:6379/ecommerce/",
+        # "LOCATION": "redis://localhost:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             # "PASSWORD": "mysecret"
@@ -142,6 +154,7 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
+# ---------------------------------------------------
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 

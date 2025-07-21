@@ -6,7 +6,5 @@ from django.core.cache import cache
 
 @receiver([post_save, post_delete], sender=Product)
 def invalidate_product_cache(sender, instance, **kwargs):
-    # print(f"{instance.category}")
-    # print(kwargs)
     cache.delete_pattern(f"*categories:{instance.category}*")
     cache.delete_pattern(f"*product:{instance.id}*")

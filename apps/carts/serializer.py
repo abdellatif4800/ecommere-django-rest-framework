@@ -1,28 +1,21 @@
-from .models import Cart, Item
-from apps.products.models import Product
-from apps.users.models import User
-from rest_framework import serializers
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 
+from rest_framework import serializers
+
+from .models import Cart, CartItem
+from apps.products.models import Product
 from apps.carts import models
+from django.contrib.auth.models import User
 
 
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Item
+        model = CartItem
         fields = "__all__"
 
-    product = serializers.PrimaryKeyRelatedField(
-        queryset=Product.objects.all(), required=True
-    )
-    quantity = serializers.IntegerField()
-    item_total = serializers.IntegerField()
-
     def create(self, validated_data):
-        return Item.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        pass
+        return CartItem.objects.create(**validated_data)
 
 
 class CartSerializer(serializers.ModelSerializer):
@@ -31,15 +24,11 @@ class CartSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    items = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all(), many=True)
+    cart_items = ItemSerializer(many=True, read_only=True)
     cart_total = serializers.IntegerField(read_only=True)
     updated_at = serializers.DateTimeField(default=None)
 
-    # def create(self, validated_data):
-    #     return Cart.objects.create(**validated_data)
-    #
     def update(self, instance, validated_data):
-
         if "cart_total" in validated_data:
             instance.cart_total = validated_data["cart_total"]
 

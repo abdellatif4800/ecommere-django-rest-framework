@@ -1,13 +1,6 @@
 from .models import Product, Image
 from rest_framework import serializers
 from django.utils import timezone
-from drf_spectacular.utils import (
-    extend_schema,
-    extend_schema_serializer,
-    extend_schema_field,
-    OpenApiParameter,
-    OpenApiExample,
-)
 
 
 class ImageSerializer(serializers.ModelSerializer):

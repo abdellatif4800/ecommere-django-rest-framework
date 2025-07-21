@@ -1,155 +1,165 @@
-from apps.products.models import Product
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render
+from django.utils import timezone
+from django.core.cache import cache
+
 from rest_framework.views import APIView
-from .serializer import CartSerializer, ItemSerializer
 from rest_framework.decorators import api_view
-from .models import Cart, Item
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from apps.products.serializer import ProductSerializer
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
-from django.utils import timezone
+from rest_framework.generics import (
+    CreateAPIView,
+    RetrieveAPIView,
+    UpdateAPIView,
+    DestroyAPIView,
+)
+
+
+from apps.products.models import Product
+from apps.products.serializer import RetriveProductSerializer
+from .serializer import CartSerializer, ItemSerializer
+from .models import Cart, CartItem
+
 from pprint import pprint
-from .permissions import CustomerAccessPermission
-from django.contrib.auth import authenticate, login
 
 
-class Cart_view(APIView):
-    # permission_classes = [IsAuthenticated]
+class Retrive_Cart(RetrieveAPIView):
+    serializer_class = CartSerializer
+    queryset = Cart.objects.all()
+    # lookup_field = "id"
 
-    def get(self, request):
-        print(request.user)
-        user = authenticate(request, username="asd", password="pass")
-        if user is not None:
-            print(user)
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
-        user_id = int(request.query_params.get("user_id"))
-        target_cart = Cart.objects.get(user=user_id)
-        all_items = []
-        for item in target_cart.items.all():
-            all_items.append(ItemSerializer(item).data)
+    def get(self, request, id):
+        target_cart = cache.get_or_set(
+            f"carts:{id}",
+            lambda: CartSerializer(Cart.objects.get(id=id)).data,
+            timeout=60 * 5,
+        )
+        return Response(target_cart, status=status.HTTP_200_OK)
+
+
+class Add_item_in_cart(CreateAPIView):
+    serializer_class = ItemSerializer
+    queryset = CartItem.objects.all()
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        cart = get_object_or_404(Cart, id=kwargs["cart_id"])
+        product = get_object_or_404(Product, id=request.data["prod_id"])
+        # --------------------------
+        for prod in CartSerializer(cart).data["cart_items"]:
+            if product.id == prod["product"]:
+                return Response(
+                    "product exist in cart", status=status.HTTP_400_BAD_REQUEST
+                )
+        if product.stock == 0:
+            return Response("product out of stock", status=status.HTTP_400_BAD_REQUEST)
+        # --------------------------
+
+        data = {
+            "cart": cart.id,
+            "product": product.id,
+            "quantity": int(request.data["quantity"]),
+            "item_total": int(request.data["quantity"]) * int(product.price),
+        }
+
+        serializer = self.get_serializer(data=data)
+        if serializer.is_valid():
+            product.stock -= int(request.data["quantity"])
+            cart.cart_total += data["item_total"]
+            serializer.save()
+            cart.save()
+            product.save()
+
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(
             {
-                "msg": "cart found",
-                "cart": CartSerializer(target_cart).data,
-                "all items in detail": all_items,
+                "cart": CartSerializer(cart).data,
+                # "prod": RetriveProductSerializer(product).data,
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class Change_quantity(UpdateAPIView):
+    serializer_class = ItemSerializer
+    queryset = CartItem.objects.all()
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, *args, **kwargs):
+        item = get_object_or_404(CartItem, id=kwargs["item_id"])
+        product = item.product
+        cart = item.cart
+        quantity = int(request.data["quantity"])
+
+        if product.stock == 0 or product.stock < 0:
+            return Response(
+                "quantity not acceptable", status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if quantity > product.stock:
+            return Response(
+                "quantity greater than product stock",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if item.quantity == quantity:
+            return Response("no changes")
+
+        if quantity < item.quantity:
+            diff = item.quantity - quantity
+            product.stock += diff
+            cart.cart_total -= diff * product.price
+        elif quantity > item.quantity:
+            diff = quantity - item.quantity
+            product.stock -= diff
+            cart.cart_total += diff * product.price
+
+        item.item_total = quantity * product.price
+        item.quantity = quantity
+
+        item.save()
+        product.save()
+        cart.save()
+
+        return Response(
+            {
+                "item": ItemSerializer(item).data,
+                "prod": RetriveProductSerializer(product).data,
             },
             status=status.HTTP_200_OK,
         )
 
 
-class Item_view(APIView):
-    def post(self, request):
-        user_id = int(request.query_params.get("user_id"))
-        prod_id = int(request.query_params.get("prod_id"))
+class Delete_item(DestroyAPIView):
+    serializer_class = ItemSerializer
+    queryset = CartItem.objects.all()
 
-        target_product = Product.objects.get(id=prod_id)
-        target_cart = Cart.objects.get(user=user_id)
-        # --------------------------------
-        items_prod_ids = []
-        for item in target_cart.items.all():
-            items_prod_ids.append(item.product.id)
-        # --------------------------------
-        if target_product.stock == 0:
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
-            return Response(
-                {
-                    "msg": f"prod with id {prod_id} is out of stock",
-                    "product": ProductSerializer(target_product).data,
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        if prod_id in items_prod_ids:
-            return Response(
-                {
-                    "msg": f"prod with id {prod_id} is aleardy in cart",
-                    "cart": CartSerializer(target_cart).data,
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        if prod_id not in items_prod_ids:
-            new_item = Item.objects.create(
-                product=target_product,
-                quantity=request.data["quantity"],
-                item_total=target_product.price * request.data["quantity"],
-            )
-            target_cart.items.add(new_item)
-            target_cart.cart_total += new_item.item_total
-            target_cart.updated_at = timezone.now()
+    def delete(self, request, *args, **kwargs):
+        item = get_object_or_404(CartItem, id=kwargs["item_id"])
+        cart = item.cart
+        product = item.product
 
-            target_cart.save()
-            return Response(
-                {
-                    "cart": CartSerializer(target_cart).data,
-                },
-                status=status.HTTP_200_OK,
-            )
+        for prod in CartSerializer(cart).data["cart_items"]:
+            if product.id == prod["product"]:
+                product.stock += item.quantity
+                cart.cart_total -= item.item_total
+                # print(product.stock)
+                item.delete()
+                cart.save()
+                product.save()
 
-    def delete(self, request):
-        user_id = int(request.query_params.get("user_id"))
-        prod_id = int(request.query_params.get("prod_id"))
-        item_id = int(request.query_params.get("item_id"))
-        # -------------------------------
-        target_product = Product.objects.get(id=prod_id)
-        target_cart = Cart.objects.get(user=user_id)
-        target_item = Item.objects.get(id=item_id)
-        cart_data = CartSerializer(target_cart).data
-
-        # --------------------------------
-        items_prod_ids = []
-        for item in target_cart.items.all():
-            items_prod_ids.append(item.product.id)
-        # ----------------------------
-        if prod_id in items_prod_ids:
-            target_cart.cart_total -= target_item.item_total
-
-            target_cart.items.remove(target_item)
-            target_item.delete()
-            target_cart.updated_at = timezone.now()
-
-            target_cart.save()
-
-            return Response(
-                {
-                    "msg": f"prod with id {prod_id} deleted from cart",
-                    "cart": CartSerializer(target_cart).data,
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        if prod_id not in items_prod_ids:
-
-            return Response(
-                {
-                    "cart": CartSerializer(target_cart).data,
-                },
-                status=status.HTTP_200_OK,
-            )
-
-
-@api_view(["PUT"])
-def change_quantity(request):
-    user_id = int(request.query_params.get("user_id"))
-    item_id = int(request.query_params.get("item_id"))
-    target_cart = Cart.objects.get(user=user_id)
-    target_item = Item.objects.get(id=item_id)
-    cart_data = CartSerializer(target_cart).data
-
-    # --------------------------------
-    items_prod_ids = []
-    for item in target_cart.items.all():
-        items_prod_ids.append(item.product.id)
-        # ----------------------------
-        if request.data["quantity"] == 0 or request.data["quantity"] < 0:
-            return Response("quantity value not acceptaple")
-        if request.data["quantity"] > target_item.product.stock:
-            return Response(
-                {
-                    "massage": f"product with id {target_item.product.id} have {target_item.product.stock} in the stock"
-                }
-            )
-        target_item.quantity = request.data["quantity"]
-        target_item.item_total = request.data["quantity"] * \
-            target_item.product.price
-        print(target_item.product.stock)
-        return Response(ItemSerializer(target_item).data)
+                return Response({"cart": CartSerializer(cart).data}, status.HTTP_200_OK)

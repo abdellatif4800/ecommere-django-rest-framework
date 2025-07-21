@@ -9,9 +9,9 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.generics import (
+    CreateAPIView,
     ListAPIView,
     RetrieveAPIView,
-    CreateAPIView,
     UpdateAPIView,
     DestroyAPIView,
 )
@@ -31,9 +31,6 @@ from .serializer import (
     ImageSerializer,
 )
 from .models import Image, Product
-from .images_handler import saveImages
-
-from pprint import pprint
 
 
 def dashboard_callback(request, context):

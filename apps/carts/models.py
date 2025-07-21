@@ -1,16 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import User
-
-
-class Item(models.Model):
-    product = models.ForeignKey("products.Product", on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=0)
-    item_total = models.IntegerField(default=0)
+from apps.products import models as prod_models
 
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    items = models.ManyToManyField(Item)
+
     cart_total = models.IntegerField(default=0)
 
-    updated_at = models.DateTimeField(null=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class CartItem(prod_models.BaseItem):
+    cart = models.ForeignKey(
+        Cart, on_delete=models.CASCADE, related_name="cart_items", null=True
+    )

@@ -3,7 +3,7 @@ name: ecommerce-django
 services:
   django-app:
     build:
-      context: ./
+      context: .
       dockerfile: Dockerfile
     container_name: ecommerce-django
     ports:
@@ -11,6 +11,7 @@ services:
     networks:
       - app-network
     volumes:
+      # - /var/run/docker.sock:/var/run/docker-host.sock 
       - ./:/usr/src/app
     environment:
       - PYTHONUNBUFFERED=1

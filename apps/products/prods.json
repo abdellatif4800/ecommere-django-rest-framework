@@ -1,0 +1,142 @@
+[
+  {
+    "name": "Smartphone",
+    "descreption": "High-end smartphone with 128GB storage",
+    "price": 999,
+    "stock": 50,
+    "category": "Electronics"
+  },
+  {
+    "name": "Laptop",
+    "descreption": "Powerful laptop for professionals",
+    "price": 1499,
+    "stock": 30,
+    "category": "Electronics"
+  },
+  {
+    "name": "Headphones",
+    "descreption": "Noise-cancelling over-ear headphones",
+    "price": 199,
+    "stock": 70,
+    "category": "Electronics"
+  },
+  {
+    "name": "Smartwatch",
+    "descreption": "Fitness tracking smartwatch",
+    "price": 299,
+    "stock": 40,
+    "category": "Electronics"
+  },
+  {
+    "name": "Bluetooth Speaker",
+    "descreption": "Portable speaker with deep bass",
+    "price": 89,
+    "stock": 60,
+    "category": "Electronics"
+  },
+  {
+    "name": "Novel: The Alchemist",
+    "descreption": "Famous novel by Paulo Coelho",
+    "price": 20,
+    "stock": 100,
+    "category": "Books"
+  },
+  {
+    "name": "Data Science Handbook",
+    "descreption": "Comprehensive guide to data science",
+    "price": 55,
+    "stock": 45,
+    "category": "Books"
+  },
+  {
+    "name": "Python for Beginners",
+    "descreption": "Introductory book to Python programming",
+    "price": 35,
+    "stock": 80,
+    "category": "Books"
+  },
+  {
+    "name": "Mystery Novel",
+    "descreption": "Thrilling detective story",
+    "price": 25,
+    "stock": 90,
+    "category": "Books"
+  },
+  {
+    "name": "Children's Story Book",
+    "descreption": "Illustrated storybook for kids",
+    "price": 18,
+    "stock": 75,
+    "category": "Books"
+  },
+  {
+    "name": "Men's T-Shirt",
+    "descreption": "Cotton T-shirt with modern fit",
+    "price": 25,
+    "stock": 100,
+    "category": "Clothing"
+  },
+  {
+    "name": "Women's Dress",
+    "descreption": "Elegant evening dress",
+    "price": 80,
+    "stock": 40,
+    "category": "Clothing"
+  },
+  {
+    "name": "Winter Jacket",
+    "descreption": "Warm and waterproof jacket",
+    "price": 120,
+    "stock": 35,
+    "category": "Clothing"
+  },
+  {
+    "name": "Sneakers",
+    "descreption": "Comfortable running shoes",
+    "price": 60,
+    "stock": 55,
+    "category": "Clothing"
+  },
+  {
+    "name": "Jeans",
+    "descreption": "Slim fit denim jeans",
+    "price": 45,
+    "stock": 65,
+    "category": "Clothing"
+  },
+  {
+    "name": "Tablet",
+    "descreption": "10-inch tablet for media and work",
+    "price": 499,
+    "stock": 25,
+    "category": "Electronics"
+  },
+  {
+    "name": "E-Reader",
+    "descreption": "E-Ink display reader for books",
+    "price": 150,
+    "stock": 30,
+    "category": "Electronics"
+  },
+  {
+    "name": "Notebook",
+    "descreption": "Classic ruled notebook",
+    "price": 10,
+    "stock": 200,
+    "category": "Books"
+  },
+  {
+    "name": "Hoodie",
+    "descreption": "Casual hoodie with front pocket",
+    "price": 35,
+    "stock": 80,
+    "category": "Clothing"
+  },
+  {
+    "name": "Sci-Fi Novel",
+    "descreption": "Futuristic science fiction story",
+    "price": 22,
+    "stock": 60,
+    "category": "Books"
+  }
+]

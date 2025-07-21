@@ -1,10 +1,5 @@
 from django.contrib import admin
-from django.contrib.postgres.fields import ArrayField
-from django.db import models
-from django.db.models import QuerySet
-from django.http import HttpRequest
-from django.shortcuts import redirect
-from django.urls import reverse_lazy
+from django.core.validators import EMPTY_VALUES
 from . import models as my_models
 
 from unfold.contrib.forms.widgets import ArrayWidget, WysiwygWidget
@@ -13,9 +8,15 @@ from unfold.contrib.forms.widgets import ArrayWidget, WysiwygWidget
 from unfold.sections import TableSection, TemplateSection
 from unfold.contrib.inlines.admin import NonrelatedTabularInline
 from unfold.decorators import action
-from unfold.components import BaseComponent, register_component
 
-from django.utils.html import format_html
+# from unfold.components import BaseComponent, register_component
+from unfold.contrib.filters.admin import (
+    BooleanRadioFilter,
+    ChoicesRadioFilter,
+    ChoicesCheckboxFilter,
+    TextFilter,
+    FieldTextFilter,
+)
 
 
 class ImagesTableSection(TableSection):
@@ -30,6 +31,18 @@ class ImagesTableSection(TableSection):
 class ImagesTabularInline(TabularInline):
     model = my_models.Image
     extra = 0
+
+
+class CustomTextFilter(TextFilter):
+    title = "Custom filter"
+    parameter_name = "query_param_in_uri"
+
+    def queryset(self, request, queryset):
+        if self.value() not in EMPTY_VALUES:
+            # Here write custom query
+            return queryset.filter(category=self.value())
+
+        return queryset
 
 
 @admin.register(my_models.Product)
@@ -54,3 +67,5 @@ class ProductsAdminSite(ModelAdmin):
         "created_at",
         "updated_at",
     ]
+    list_filter_submit = True
+    list_filter = [CustomTextFilter]

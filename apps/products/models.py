@@ -10,12 +10,23 @@ class Product(models.Model):
     category = models.CharField()
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True, blank=True)
+    # stripe_product_id = models.CharField(null=True, blank=True)
+    stripe_price_id = models.CharField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if self.pk and Product.objects.filter(pk=self.pk).exists():
             # Only update when it's not creation
             self.updated_at = timezone.now()
         super().save(*args, **kwargs)
+
+
+class BaseItem(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=0)
+    item_total = models.IntegerField(default=0)
+
+    class Meta:
+        abstract = True
 
 
 class Image(models.Model):

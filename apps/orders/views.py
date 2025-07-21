@@ -1,71 +1,83 @@
-from apps.carts.serializer import CartSerializer
 from django.shortcuts import render
+from django.utils import timezone
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404, get_list_or_404
+
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Order_Item, OrderList, Order
-from apps.carts.models import Cart
-from .serializer import OrderListSerializer, OrderSerializer
-from django.utils import timezone
+from rest_framework import generics
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework import status
 
 
-class OrderList_view(APIView):
-    def get(self, request):
-        user_id = int(request.query_params.get("user_id"))
-        target_orderList = OrderList.objects.get(user=user_id)
-        target_cart = Cart.objects.get(user=user_id)
-        return Response(
-            {
-                "orderList": OrderListSerializer(target_orderList).data,
-            }
-        )
+from apps.carts import serializer as carts_serializer
+from apps.carts.models import Cart, CartItem
+from .models import OrderItem, Order
+from .serializer import OrderSerializer, OrderItemSerializer
 
 
-class Order_view(APIView):
-    def post(self, request):
-        user_id = int(request.query_params.get("user_id"))
-        target_orderList = OrderList.objects.get(user=user_id)
-        target_cart = Cart.objects.get(user=user_id)
+class Create_order(generics.CreateAPIView):
+    serializer_class = OrderSerializer
+    queryset = Order.objects.all()
 
-        payment_method = request.data['payment_method']
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
-        if len(target_cart.items.all()) != 0:
-            new_order = Order.objects.create(
-                order_total=target_cart.cart_total,
-                created_at=timezone.now(),
+    def post(self, request, *args, **kwargs):
+        cart = get_object_or_404(Cart, id=kwargs["cart_id"])
+
+        items = CartItem.objects.filter(cart=kwargs["cart_id"])
+
+        if not items.exists():
+            return Response("No items", status=status.HTTP_400_BAD_REQUEST)
+
+        order_items_data = []
+
+        for item in items:
+            order_items_data.append(
+                {
+                    "product": item.product.id,
+                    "quantity": item.quantity,
+                    "item_total": item.item_total,
+                }
             )
 
-            for item in target_cart.items.all():
-                new_order_item = Order_Item.objects.create(
-                    product=item.product, quantity=item.quantity, item_total=item.item_total
+        data = {
+            **request.data,
+            "user": request.user.id,
+            "order_total": cart.cart_total,
+            "order_items": order_items_data,
+        }
+
+        if items.exists():
+            serializer = self.get_serializer(data=data)
+            if serializer.is_valid():
+                order = serializer.save()
+
+                if order is not None:
+                    for item in items:
+                        item.delete()
+
+                cart.cart_total = 0
+                cart.save()
+
+                return Response(
+                    {
+                        "order": OrderSerializer(order).data,
+                    }
                 )
-                new_order.items.add(new_order_item)
+            else:
+                print(serializer.data)
 
-            new_order.payment_method = payment_method
-            if payment_method == "cash on delivery":
-                new_order.shipping_status = "processing"
-                new_order.save()
-            elif payment_method == "by card":
-                new_order.shipping_status = "pending"
-                new_order.save()
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            target_orderList.orders.add(new_order)
 
-            for item in target_cart.items.all():
-                target_cart.items.remove(item)
-                item.delete()
-                target_cart.cart_total = 0
-            target_cart.save()
-            return Response(
-                {
-                    "orderList": OrderListSerializer(target_orderList).data,
-                    "cart": CartSerializer(target_cart).data,
-                }
-            )
-        if len(target_cart.items.all()) == 0:
+class Retrive_order(generics.RetrieveAPIView):
+    serializer_class = OrderSerializer
+    queryset = Order.objects.all()
+    lookup_field = "id"
 
-            return Response(
-                {
-                    "msg": "Cart is empty"
-
-                }
-            )
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
