@@ -6,6 +6,11 @@ urlpatterns = [
     path("payWithIframe/", views.PayWithIframe_view.as_view(), name="Pay By IFrame"),
     path("retriveIframCheckoutLink/", views.PayWithIframe_view.as_view()),
     path(
+        "Paymob_webhook/",
+        views.Paymob_webhook.as_view(),
+        name="Transaction is done",
+    ),
+    path(
         "stripe_checkout_webhook/",
         views.Stripe_checkout_webhook.as_view(),
         name="Transaction is done",

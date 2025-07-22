@@ -101,42 +101,42 @@ class PayWithIframe_view(APIView):
         return Response(Init_paymentSerializer(target_payment).data)
 
 
-# class Paymob_webhook(generics.CreateAPIView):
-#     serializer_class = Transaction_serialiazer
-#     queryset = Transaction.objects.all()
+class Paymob_webhook(generics.CreateAPIView):
+    serializer_class = Transaction_serialiazer
+    queryset = Transaction.objects.all()
 
-#     def post(self, request):
-#         # if request.data["obj"]["success"] == True:
-#         #     # change state in init_payment
-#         #     init_payment = Init_payment.objects.get(
-#         #         paymob_order_id=request.data["obj"]["order"]["id"]
-#         #     )
-#         #     # paymob_order_id=329355537)
+    def post(self, request):
+        if request.data["obj"]["success"] == True:
+            # change state in init_payment
+            init_payment = Init_payment.objects.get(
+                paymob_order_id=request.data["obj"]["order"]["id"]
+            )
+            # paymob_order_id=329355537)
 
-#         #     init_payment.status = "PAID"
-#         #     init_payment.save()
-#         #     # ******************************************#
-#         #     # change order state in db
-#         #     init_payment.order.shipping_status = Order.PROCESSING
-#         #     init_payment.order.save()
-#         #     # ******************************************#
-#         #     # save transaction in db
-#         #     Transaction.objects.create(
-#         #         transction_id=request.data["obj"]["id"],
-#         #         paymob_order_id=request.data["obj"]["order"]["id"],
-#         #         amount_cents=request.data["obj"]["order"]["amount_cents"],
-#         #         success=request.data["obj"]["success"],
-#         #         api_source=request.data["obj"]["api_source"],
-#         #         created_at=request.data["obj"]["created_at"],
-#         #         order=Order.objects.get(id=init_payment.order.id),
-#         #     )
-#         #     # ******************************************#
-#         #     print("transction completed")
-#         #     return Response("transction completed")
-#         # else:
-#         #     print("transction filed")
-#         #     return Response("transction filed")
-#         # # return Response(init_payment.order.shipping_status)
+            init_payment.status = "PAID"
+            init_payment.save()
+            # ******************************************#
+            # change order state in db
+            init_payment.order.shipping_status = Order.PROCESSING
+            init_payment.order.save()
+            # ******************************************#
+            # save transaction in db
+            Transaction.objects.create(
+                transction_id=request.data["obj"]["id"],
+                paymob_order_id=request.data["obj"]["order"]["id"],
+                amount_cents=request.data["obj"]["order"]["amount_cents"],
+                success=request.data["obj"]["success"],
+                api_source=request.data["obj"]["api_source"],
+                created_at=request.data["obj"]["created_at"],
+                order=Order.objects.get(id=init_payment.order.id),
+            )
+            # ******************************************#
+            print("transction completed")
+            return Response("transction completed")
+        else:
+            print("transction filed")
+            return Response("transction filed")
+        # return Response(init_payment.order.shipping_status)
 
 
 class Create_stripe_checkout(generics.CreateAPIView):
