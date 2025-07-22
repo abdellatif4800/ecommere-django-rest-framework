@@ -1,5 +1,7 @@
 from django.contrib import admin
 from . import models
+from apps.payment import models as payment_models
+
 from unfold.admin import TabularInline, ModelAdmin
 from unfold.contrib.forms.widgets import ArrayWidget, WysiwygWidget
 from unfold.contrib.forms.widgets import ArrayWidget, WysiwygWidget
@@ -44,7 +46,9 @@ class ItemsTabularInline(TabularInline):
 @admin.register(models.Order)
 class CustomOrderClass(ModelAdmin):
     list_display = ["id", "user", "order_total", "created_at", "updated_at"]
-    inlines = [ItemsTabularInline]
+    inlines = [
+        ItemsTabularInline,
+    ]
     list_sections = [
         ItemsTableSection,
     ]

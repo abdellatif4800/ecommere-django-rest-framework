@@ -20,7 +20,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-
 # Application definition
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [

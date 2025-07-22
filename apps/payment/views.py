@@ -221,7 +221,7 @@ class Retrieve_stripe_checkout(generics.RetrieveAPIView):
         return Response(self.get_serializer(instance).data, status=status.HTTP_200_OK)
 
 
-class Stripe_webhook(generics.UpdateAPIView):
+class Stripe_checkout_webhook(generics.UpdateAPIView):
     serializer_class = Stripe_checkout_serializer
     # lookup_field = "stripe_checkout_id"
     queryset = Stripe_checkout.objects.all()
@@ -232,20 +232,28 @@ class Stripe_webhook(generics.UpdateAPIView):
 
     def post(self, request):
         if request.data.get("data").get("object").get("status") == "complete":
-            # print(request.data.get("data").get("object").get("id"))
-            print("from webhook: ", self.get_object())
+            checkout = self.get_object()
+            checkout.has_paid = True
+            checkout.save()
+            return Response("payment is successed", status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response("payment is faild", status=status.HTTP_402_PAYMENT_REQUIRED)
 
-            return Response(request.data)
 
-
+# print(
 # webhook_endpoints = stripe.WebhookEndpoint.modify(
 #     "we_1RiqGSH05IPbx08PEpIX6dHU",
 #     enabled_events=["checkout.session.completed"],
-#     url="https://dinner-alleged-identifies-interstate.trycloudflare.com//payment/stripe_webhook/",
+#     url="https://connections-precipitation-circle-come.trycloudflare.com/payment/stripe_checkout_webhook/",
 # )
-# print(webhook_endpoints)
-# events = stripe.Event.list()
-# sessions = stripe.checkout.Session.retrieve(
-#     "cs_test_a1JoIUsW79Iz15fJq1jMnFszTBBFtzxkNNu0hRTnjKO6GupvePWUliCHL0"
 # )
-# print(sessions)
+
+# print(
+#  stripe.WebhookEndpoint.create(
+#     enabled_events=["checkout.session.completed"],
+#     url="https://connections-precipitation-circle-come.trycloudflare.com/payment/stripe_checkout_webhook/",
+# )
+# )
+
+# print(stripe.WebhookEndpoint.list())
+# print(stripe.Event.list())
